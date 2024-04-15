@@ -80,17 +80,7 @@ open class BarcodeScan : AppCompatActivity() {
                     Toast.LENGTH_LONG).show()
             }
 
-            //            override fun receiveDetections(p0: Detector.Detections<Barcode>) {
-//                val barcodes = p0.detectedItems
-//                if(barcodes.size()!=0){
-//                    binding.txtBarcodeValue!!.post{
-//                        binding.btnAction!!.text = "SEARCH ITEM"
-//                        intentData = barcodes.valueAt(0).displayValue
-//                        binding.txtBarcodeValue.setText(intentData)
-////                        finish()
-//                    }
-//                }
-//            }
+
             private fun checkBarcodeInDatabase(barcode: String) {
                 val client = OkHttpClient()
 
@@ -190,3 +180,6 @@ open class BarcodeScan : AppCompatActivity() {
 
 
 }
+
+
+
