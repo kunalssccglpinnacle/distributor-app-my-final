@@ -1,8 +1,9 @@
 package com.example.piracycheckapp
-
+//
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
@@ -81,51 +82,21 @@ open class BarcodeScan : AppCompatActivity() {
             }
 
 
-//            private fun checkBarcodeInDatabase(barcode: String) {
-//                val client = OkHttpClient()
 //
-//                val request = Request.Builder()
-//                    .url("https://nodei.ssccglpinnacle.com/getScannedInbound")
-//                    .build()
-//
-//                client.newCall(request).enqueue(object : Callback {
-//                    override fun onFailure(call: Call, e: IOException) {
-//                        e.printStackTrace()
-//                        // Handle failure
-//                        runOnUiThread {
-//                            Toast.makeText(applicationContext, "Failed to connect to server", Toast.LENGTH_SHORT).show()
-//                        }
-//                    }
-//
-//                    override fun onResponse(call: Call, response: Response) {
-//                        response.use {
-//                            if (!response.isSuccessful) {
-//                                // Handle unsuccessful response
-//                                runOnUiThread {
-//                                    Toast.makeText(applicationContext, "Failed to get response from server", Toast.LENGTH_SHORT).show()
-//                                }
-//                            } else {
-//                                val responseData = response.body?.string()
-//                                responseData?.let { parseApiResponse(it, barcode) }
-//                            }
-//                        }
-//                    }
-//                })
-//            }
 
 //try
             private fun checkBarcodeInDatabase(barcode: String) {
                 val client = OkHttpClient()
 
                 val json = JSONObject()
-                json.put("barcode", barcode)
+                json.put("searchValue", barcode)
 
                 val requestBody = json.toString()
 
                 val request = Request.Builder()
                     .url("https://nodei.ssccglpinnacle.com/searchBarr1")
 
-                   // .url("https://nodei.ssccglpinnacle.com/count")
+                  //  .url("https://nodei.ssccglpinnacle.com/count")
                     .post(RequestBody.create("application/json".toMediaTypeOrNull(), requestBody))
                     .build()
 
@@ -157,38 +128,19 @@ open class BarcodeScan : AppCompatActivity() {
 
 
 
-           // try
+
+
+
 //            private fun parseApiResponse(responseData: String, barcode: String) {
-//                try {
-//                    val jsonObject = JSONObject(responseData)
-//                    val found = jsonObject.getBoolean("found")
-//                    var message = ""
-//
-//                    if (found) {
-//
-////                        val responseData = jsonObject.getString("responseData")
-////                        val barcode = jsonObject.getString("barcode")
-//                        val result = jsonObject.getString("result")
-//                        message = "Scanned barcode belongs to Pinnacle Data base with value: $result "
-//                    } else {
-//                        message = "Scanned barcode does not belong to the database."
-//                    }
-//
-//                    runOnUiThread {
-//                        binding.txtMessage.text = message
-//                        binding.txtMessage.visibility = View.VISIBLE
-//                    }
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    runOnUiThread {
-//                        Toast.makeText(applicationContext, "Failed to parse response", Toast.LENGTH_SHORT).show()
-//                    }
+//                runOnUiThread {
+//                    binding.txtMessage.text = responseData
+//                    binding.txtMessage.visibility = View.VISIBLE
 //                }
 //            }
-//
 
 
             private fun parseApiResponse(responseData: String, barcode: String) {
+                Log.d("Response", responseData) // Add this line to log the response data
                 runOnUiThread {
                     binding.txtMessage.text = responseData
                     binding.txtMessage.visibility = View.VISIBLE
@@ -196,62 +148,40 @@ open class BarcodeScan : AppCompatActivity() {
             }
 
 
-
-
-//            private fun parseApiResponse(responseData: String, scannedBarcode: String) {
-//                val jsonArray = JSONArray(responseData)
-//                var found = false
-//                var message = ""
-//
-//                for (i in 0 until jsonArray.length()) {
-//                    val jsonObject = jsonArray.getJSONObject(i)
-//                    val barcodeData = jsonObject.getJSONArray("barcodeData")
-//
-//                    for (j in 0 until barcodeData.length()) {
-//                        if (barcodeData.getString(j) == scannedBarcode) {
-//                            found = true
-//                            val title = jsonObject.getString("Title")
-//                            val orderno = jsonObject.getString("orderno")
-//                            val BatchID = jsonObject.getString("BatchID")
-//                            val date = jsonObject.getString("date")
-//
-//                            //message = "Scanned barcode belongs to Pinnacle Data base so book is original with: Tittle-->$title, Order no --> $orderno,Batch ID --> $BatchID and Date-->$date"
-//                            message = "Scanned barcode belongs to Pinnacle Data base so book is original with:\nTitle-->$title\nOrder no --> $orderno\nBatch ID --> $BatchID\nDate-->$date"
-//
-//
-//                            break
-//                        }
-//                    }
-//                    if (found) {
-//                        break
-//                    }
-//                }
-//
-//                if (!found) {
-//                    message = "Scanned barcode does not belong to the database."
-//                }
-//
-//                runOnUiThread {
-//                    binding.txtMessage.text = message
-//                    binding.txtMessage.visibility = View.VISIBLE
-//                }
-//            }
-
             // Modify your receiveDetections function to call checkBarcodeInDatabase
             override fun receiveDetections(p0: Detector.Detections<Barcode>) {
                 val barcodes = p0.detectedItems
-                if (barcodes.size() != 0) {
-                    binding.txtBarcodeValue!!.post {
-                        binding.btnAction!!.text = "SEARCH ITEM"
-                        val scannedBarcode = barcodes.valueAt(0).displayValue
-                        binding.txtBarcodeValue.setText(scannedBarcode)
-                        checkBarcodeInDatabase(scannedBarcode)
-                    }
+                for (i in 0 until barcodes.size()) {
+                    val scannedBarcode = barcodes.valueAt(i).displayValue
+                    checkBarcodeInDatabase(scannedBarcode)
                 }
+                // You can also update the UI here if needed
             }
+
+
+
+
+
+            //
+            // Modify your receiveDetections function to call checkBarcodeInDatabase
+//            override fun receiveDetections(p0: Detector.Detections<Barcode>) {
+//                val barcodes = p0.detectedItems
+//                if (barcodes.size() != 0) {
+//                    binding.txtBarcodeValue!!.post {
+//                        binding.btnAction!!.text = "SEARCH ITEM"
+//                        val scannedBarcode = barcodes.valueAt(0).displayValue
+//                        binding.txtBarcodeValue.setText(scannedBarcode)
+//                        checkBarcodeInDatabase(scannedBarcode)
+//                    }
+//                }
+//            }
 
         })
     }
+
+
+
+
 
 
     override fun onPause(){
@@ -265,6 +195,7 @@ open class BarcodeScan : AppCompatActivity() {
 
 
 }
+
 
 
 
