@@ -131,21 +131,17 @@ open class BarcodeScan : AppCompatActivity() {
 
 
 
-//            private fun parseApiResponse(responseData: String, barcode: String) {
-//                runOnUiThread {
-//                    binding.txtMessage.text = responseData
-//                    binding.txtMessage.visibility = View.VISIBLE
-//                }
-//            }
-
+//
 
             private fun parseApiResponse(responseData: String, barcode: String) {
-                Log.d("Response", responseData) // Add this line to log the response data
+                val message = " Piracy Check \n$barcode Barcode belongs to pinnacle Database \n  $responseData \n So Book is Original "
+                Log.d("Response", message) // Log the response data along with a message
                 runOnUiThread {
-                    binding.txtMessage.text = responseData
+                    binding.txtMessage.text = message
                     binding.txtMessage.visibility = View.VISIBLE
                 }
             }
+//
 
 
             // Modify your receiveDetections function to call checkBarcodeInDatabase
@@ -162,19 +158,7 @@ open class BarcodeScan : AppCompatActivity() {
 
 
 
-            //
-            // Modify your receiveDetections function to call checkBarcodeInDatabase
-//            override fun receiveDetections(p0: Detector.Detections<Barcode>) {
-//                val barcodes = p0.detectedItems
-//                if (barcodes.size() != 0) {
-//                    binding.txtBarcodeValue!!.post {
-//                        binding.btnAction!!.text = "SEARCH ITEM"
-//                        val scannedBarcode = barcodes.valueAt(0).displayValue
-//                        binding.txtBarcodeValue.setText(scannedBarcode)
-//                        checkBarcodeInDatabase(scannedBarcode)
-//                    }
-//                }
-//            }
+
 
         })
     }
