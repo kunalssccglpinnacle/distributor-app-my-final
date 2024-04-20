@@ -38,7 +38,7 @@ open class BarcodeScan : AppCompatActivity() {
             .setBarcodeFormats(Barcode.CODE_128)
             .build()
             cameraSource = CameraSource.Builder(this,barcodeDetector)
-                .setRequestedPreviewSize(500,300)
+                .setRequestedPreviewSize(1920,1080)
                 .setAutoFocusEnabled(true)
 //            .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .build() } catch (e:Exception){
@@ -152,18 +152,42 @@ open class BarcodeScan : AppCompatActivity() {
 //            }
 
 
+//            private fun parseApiResponse(responseData: String, barcode: String) {
+//                // Assume responseData is in JSON format like {"result": "value"}
+//                val jsonObject = JSONObject(responseData)
+//                val resultValue = jsonObject.optString("result")
+//
+//
+//
+//
+//                val message = "$barcode Belongs To \n  $resultValue  "
+//                Log.d("Responce", message) // Log the response data along with a message
+//                runOnUiThread {
+//                    binding.txtMessage.text = message
+//                    binding.txtMessage.visibility = View.VISIBLE
+//                }
+//            }
+
             private fun parseApiResponse(responseData: String, barcode: String) {
                 // Assume responseData is in JSON format like {"result": "value"}
                 val jsonObject = JSONObject(responseData)
                 val resultValue = jsonObject.optString("result")
 
-                val message = "$barcode Belongs To \n  $resultValue  "
-                Log.d("Responce", message) // Log the response data along with a message
+                val message = if (resultValue == "Not Verified") {
+                    "$barcode Barcode is not from our DataBase"
+                } else {
+                    "$barcode Belongs To \n $resultValue \n Verified "
+                }
+
+                Log.d("Response", message) // Log the response data along with a message
                 runOnUiThread {
                     binding.txtMessage.text = message
                     binding.txtMessage.visibility = View.VISIBLE
                 }
             }
+
+
+
 
             // Modify your receiveDetections function to call checkBarcodeInDatabase
             override fun receiveDetections(p0: Detector.Detections<Barcode>) {
