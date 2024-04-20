@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import com.example.piracycheckapp.databinding.ActivityBarcodeScanBinding
 import com.google.android.gms.vision.CameraSource
@@ -15,6 +16,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector
 
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.json.JSONObject
 import java.io.IOException
 
@@ -30,6 +32,9 @@ open class BarcodeScan : AppCompatActivity() {
         binding = ActivityBarcodeScanBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
+
+
+
 
 
 
@@ -85,6 +90,11 @@ open class BarcodeScan : AppCompatActivity() {
 //
 
 //try
+            // Inside BarcodeScan class
+
+
+
+
             private fun checkBarcodeInDatabase(barcode: String) {
                 val client = OkHttpClient()
 
@@ -125,23 +135,44 @@ open class BarcodeScan : AppCompatActivity() {
                 })
             }
 
+//            private fun parseApiResponse(responseData: String, barcode: String) {
+//                val message = "$barcode  This Book Belongs To \n  $responseData  "
+//                Log.d("Responce", message) // Log the response data along with a message
+//                runOnUiThread {
+//                    binding.txtMessage.text = message
+//                    binding.txtMessage.visibility = View.VISIBLE
+//                }
+//            }
 
-
-
-
-
-
+//            private fun parseApiResponse(responseData: String, barcode: String) {
+//                // Modify the responseData here, for example:
+//                val modifiedResponseData = responseData.toUpperCase()
 //
+//                val message = "$barcode Belongs To \n  $modifiedResponseData  "
+//                Log.d("Responce", message) // Log the response data along with a message
+//                runOnUiThread {
+//                    binding.txtMessage.text = message
+//                    binding.txtMessage.visibility = View.VISIBLE
+//                }
+//            }
+
 
             private fun parseApiResponse(responseData: String, barcode: String) {
-                val message = " Piracy Check \n$barcode Barcode belongs to pinnacle Database \n  $responseData \n So Book is Original "
-                Log.d("Response", message) // Log the response data along with a message
+                // Assume responseData is in JSON format like {"result": "value"}
+                val jsonObject = JSONObject(responseData)
+                val resultValue = jsonObject.optString("result")
+
+                val message = "$barcode Belongs To \n  $resultValue  "
+                Log.d("Responce", message) // Log the response data along with a message
                 runOnUiThread {
                     binding.txtMessage.text = message
                     binding.txtMessage.visibility = View.VISIBLE
                 }
             }
-//
+
+
+
+
 
 
             // Modify your receiveDetections function to call checkBarcodeInDatabase
@@ -154,19 +185,8 @@ open class BarcodeScan : AppCompatActivity() {
                 // You can also update the UI here if needed
             }
 
-
-
-
-
-
-
         })
     }
-
-
-
-
-
 
     override fun onPause(){
         super.onPause()
