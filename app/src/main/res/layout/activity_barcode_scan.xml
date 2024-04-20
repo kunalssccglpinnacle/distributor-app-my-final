@@ -9,16 +9,65 @@
 
 
 
-    <SurfaceView
-        android:id="@+id/surfaceView"
-        android:layout_width="396dp"
-        android:layout_height="297dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@id/btnAction"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
+
+
+
+
+
+
+<!--    <SurfaceView-->
+<!--        android:id="@+id/surfaceView"-->
+<!--        android:layout_width="350dp"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:layout_marginStart="16dp"-->
+
+<!--        android:background="#33000000"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:paddingBottom="16dp"-->
+
+
+<!--        app:layout_constraintBottom_toTopOf="@id/btnAction"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Camera Preview SurfaceView -->
+        <SurfaceView
+            android:id="@+id/surfaceView"
+            android:layout_width="350dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:paddingBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@id/btnAction"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Image Frame -->
+        <ImageView
+
+            android:src="@drawable/barcode"
+            android:scaleType="fitXY"
+            android:layout_width="350dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            />
+
+    </FrameLayout>
+
+
+
+
 
     <TextView
         android:id="@+id/txtBarcodeValue"
@@ -33,7 +82,8 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        tools:ignore="NotSibling" />
 
     <Button
         android:id="@+id/btnAction"

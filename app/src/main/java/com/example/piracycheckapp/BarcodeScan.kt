@@ -33,11 +33,6 @@ open class BarcodeScan : AppCompatActivity() {
         setContentView(binding.root)
     }
 
-
-
-
-
-
     private fun iniBc(){
         try {barcodeDetector = BarcodeDetector.Builder(this)
             .setBarcodeFormats(Barcode.CODE_128)
@@ -169,11 +164,6 @@ open class BarcodeScan : AppCompatActivity() {
                     binding.txtMessage.visibility = View.VISIBLE
                 }
             }
-
-
-
-
-
 
             // Modify your receiveDetections function to call checkBarcodeInDatabase
             override fun receiveDetections(p0: Detector.Detections<Barcode>) {
