@@ -43,7 +43,7 @@ open class BarcodeScan : AppCompatActivity() {
             .setBarcodeFormats(Barcode.CODE_128)
             .build()
             cameraSource = CameraSource.Builder(this,barcodeDetector)
-                .setRequestedPreviewSize(1920,1080)
+                .setRequestedPreviewSize(500,300)
                 .setAutoFocusEnabled(true)
 //            .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .build() } catch (e:Exception){
