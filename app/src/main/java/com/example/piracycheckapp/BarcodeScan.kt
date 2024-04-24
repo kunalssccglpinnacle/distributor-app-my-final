@@ -203,7 +203,7 @@ class BarcodeScan : AppCompatActivity() {
         val resultValue = jsonObject.optString("result")
 
         val message = if (resultValue == "Not Verified") {
-            "$originalMessage\n Barcode is not from our Database"
+            "$originalMessage\n Barcode is not from our Database!!!!!!!!!!"
         } else {
             "$originalMessage\n Belongs To \n $resultValue \n Verified "
         }
