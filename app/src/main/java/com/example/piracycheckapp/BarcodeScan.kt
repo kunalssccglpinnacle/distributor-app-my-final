@@ -132,7 +132,7 @@ class BarcodeScan : AppCompatActivity() {
 
     private fun showBarcodeInfo(apiResponse: GetKeyResponse?) {
         if (apiResponse != null) {
-            val message = "Scanned barcode belongs to Pinnacle Database with:\nKey --> ${apiResponse.key}"
+            val message = "${apiResponse.key}"
             runOnUiThread {
                 binding.txtMessage?.text = message
                 binding.txtMessage?.visibility = View.VISIBLE
@@ -177,7 +177,7 @@ class BarcodeScan : AppCompatActivity() {
     }
 
     private fun showSearchBarr1Response(response: SearchBarr1Response) {
-        val message = "SearchBarr1 response:\nResult --> ${response.result}"
+        val message = "Belongs to :\nBelongs to--> ${response.result }\n verified "
         runOnUiThread {
             binding.txtMessage?.text = message
             binding.txtMessage?.visibility = View.VISIBLE
