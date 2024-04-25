@@ -1,5 +1,9 @@
 package com.example.piracycheckapp
 
+import ApiService
+import GetKeyResponse
+import SearchBarr1Request
+import SearchBarr1Response
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,25 +16,29 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
-
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import org.json.JSONArray
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.json.JSONObject
-import java.io.IOException
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 class BarcodeScan : AppCompatActivity() {
     private lateinit var binding: ActivityBarcodeScanBinding
     private lateinit var barcodeDetector: BarcodeDetector
     private lateinit var cameraSource: CameraSource
+    private var isCameraStarted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBarcodeScanBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        iniBc()
+        initBarcodeScanner()
     }
 
-    private fun iniBc(){
+    private fun initBarcodeScanner() {
         try {
             barcodeDetector = BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.CODE_128)
@@ -39,20 +47,23 @@ class BarcodeScan : AppCompatActivity() {
                 .setRequestedPreviewSize(1920, 1080)
                 .setAutoFocusEnabled(true)
                 .build()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(applicationContext, "Error initializing barcode scanner", Toast.LENGTH_SHORT).show()
+            showToast("Error initializing barcode scanner")
             return
         }
 
-        binding.surfaceView!!.holder.addCallback(object: SurfaceHolder.Callback{
+        binding.surfaceView!!.holder.addCallback(object : SurfaceHolder.Callback {
             @SuppressLint("MissingPermission")
             override fun surfaceCreated(holder: SurfaceHolder) {
-                try {
-                    cameraSource.start(binding.surfaceView!!.holder)
-                }catch (e:IOException){
-                    e.printStackTrace()
-                    Toast.makeText(applicationContext, "Error starting camera", Toast.LENGTH_SHORT).show()
+                if (!isCameraStarted) {
+                    try {
+                        cameraSource.start(binding.surfaceView!!.holder)
+                        isCameraStarted = true
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        showToast("Error starting camera")
+                    }
                 }
             }
 
@@ -60,169 +71,134 @@ class BarcodeScan : AppCompatActivity() {
                 holder: SurfaceHolder,
                 format: Int,
                 width: Int,
-                height: Int) {
+                height: Int
+            ) {
             }
 
             override fun surfaceDestroyed(holder: SurfaceHolder) {
                 try {
                     cameraSource.stop()
+                    isCameraStarted = false
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    // Handle camera stop error
-                    Toast.makeText(applicationContext, "Error stopping camera", Toast.LENGTH_SHORT).show()
+                    showToast("Error stopping camera")
                 }
             }
 
         })
 
-        barcodeDetector.setProcessor(object : Detector.Processor<Barcode>{
+        barcodeDetector.setProcessor(object : Detector.Processor<Barcode> {
             override fun release() {
-                Toast.makeText(applicationContext, "barcode scanner has been stopped",
-                    Toast.LENGTH_LONG).show()
+                showToast("Barcode scanner has been stopped")
             }
 
             override fun receiveDetections(detections: Detector.Detections<Barcode>) {
                 val barcodes = detections.detectedItems
                 if (barcodes.size() > 0) {
                     val scannedBarcode = barcodes.valueAt(0).displayValue
-                    checkBarcodeInDatabase(scannedBarcode)
+                    getBarcodeInfo(scannedBarcode)
                 }
             }
         })
     }
 
-    private fun checkBarcodeInDatabase(barcode: String) {
-        val client = OkHttpClient()
-
-        val request = Request.Builder()
-            .url("https://nodei.ssccglpinnacle.com/getKey")
+    private fun getBarcodeInfo(barcode: String) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://nodei.ssccglpinnacle.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(OkHttpClient.Builder().build())
             .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "Failed to connect to server for API 1", Toast.LENGTH_SHORT).show()
+        val api = retrofit.create(ApiService::class.java)
+        val call = api.getKey(barcode)
+        call.enqueue(object : Callback<GetKeyResponse> {
+            override fun onResponse(call: Call<GetKeyResponse>, response: Response<GetKeyResponse>) {
+                if (response.isSuccessful) {
+                    val result = response.body()
+                    result?.let {
+                        showBarcodeInfo(it)
+                    }
+                } else {
+                    showToast("Failed to get response from server")
                 }
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) {
-                        runOnUiThread {
-                            Toast.makeText(applicationContext, "Failed to get response from server for API 1", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        val responseData = response.body?.string()
-                        responseData?.let { parseApiResponse(it, barcode) }
-                    }
-                }
+            override fun onFailure(call: Call<GetKeyResponse>, t: Throwable) {
+                t.printStackTrace()
+                showToast("Failed to connect to server")
             }
         })
     }
 
-    // Inside the parseApiResponse function
-    private fun parseApiResponse(responseData: String, scannedBarcode: String) {
-        val jsonArray = JSONArray(responseData)
-        var found = false
-        var message = ""
-        var key = ""
-
-        for (i in 0 until jsonArray.length()) {
-            val jsonObject = jsonArray.getJSONObject(i)
-            val batchId = jsonObject.getString("batchId")
-            val keyValuePairs = jsonObject.getJSONArray("keyValuePairs")
-
-            for (j in 0 until keyValuePairs.length()) {
-                val pairObject = keyValuePairs.getJSONObject(j)
-                val k = pairObject.getString("key")
-                val value = pairObject.getString("value")
-
-                if (value == scannedBarcode) {
-                    found = true
-                    message = "Scanned barcode belongs to Pinnacle Database so the book is original with:\nBatch ID --> $batchId\nKey --> $k"
-                    key = k // Assign the key to the 'key' variable
-                    break
-                }
-            }
-            if (found) {
-                break
-            }
-        }
-
-        if (!found) {
-            message = "Scanned barcode does not belong to the database."
+    private fun showBarcodeInfo(apiResponse: GetKeyResponse?) {
+        if (apiResponse != null) {
+            val message = "Scanned barcode belongs to Pinnacle Database with:\nKey --> ${apiResponse.key}"
             runOnUiThread {
                 binding.txtMessage?.text = message
                 binding.txtMessage?.visibility = View.VISIBLE
             }
+
+            // Call the second API with the key
+            searchBarr1(apiResponse.key)
         } else {
-            checkSecondApi(key, message) // Pass the 'key' to the checkSecondApi function
+            runOnUiThread {
+                binding.txtMessage?.text = "not found in api 1"
+                binding.txtMessage?.visibility = View.VISIBLE
+            }
         }
     }
 
-
-    private fun checkSecondApi(key: String, message: String) {
-        val client = OkHttpClient()
-
-        val json = JSONObject()
-        json.put("searchValue", key)
-
-        val requestBody = json.toString()
-
-        val request = Request.Builder()
-            .url("https://nodei.ssccglpinnacle.com/searchBarr1")
-            .post(RequestBody.create("application/json".toMediaTypeOrNull(), requestBody))
+    private fun searchBarr1(key: String) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://nodei.ssccglpinnacle.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(OkHttpClient.Builder().build())
             .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "Failed to connect to server for API 2", Toast.LENGTH_SHORT).show()
+        val api = retrofit.create(ApiService::class.java)
+        val call = api.searchBarr1(SearchBarr1Request(key))
+        call.enqueue(object : Callback<SearchBarr1Response> {
+            override fun onResponse(call: Call<SearchBarr1Response>, response: Response<SearchBarr1Response>) {
+                if (response.isSuccessful) {
+                    val result = response.body()
+                    result?.let {
+                        showSearchBarr1Response(it)
+                    }
+                } else {
+                    showToast("Failed to get response from server")
                 }
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) {
-                        runOnUiThread {
-                            Toast.makeText(applicationContext, "Failed to get response from server for API 2", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        val responseData = response.body?.string()
-                        responseData?.let { parseSecondApiResponse(it, message) }
-                    }
-                }
+            override fun onFailure(call: Call<SearchBarr1Response>, t: Throwable) {
+                t.printStackTrace()
+                showToast("Failed to connect to server")
             }
         })
     }
 
-    private fun parseSecondApiResponse(responseData: String, originalMessage: String) {
-        val jsonObject = JSONObject(responseData)
-        val resultValue = jsonObject.optString("result")
-
-        val message = if (resultValue == "Not Verified") {
-            "$originalMessage\n Barcode is not from our Database!!!!!!!!!!"
-        } else {
-            "$originalMessage\n Belongs To \n $resultValue \n Verified "
-        }
-
-        Log.d("Response", message) // Log the response data along with a message
+    private fun showSearchBarr1Response(response: SearchBarr1Response) {
+        val message = "SearchBarr1 response:\nResult --> ${response.result}"
         runOnUiThread {
             binding.txtMessage?.text = message
             binding.txtMessage?.visibility = View.VISIBLE
         }
     }
 
+
+    private fun showToast(message: String) {
+        runOnUiThread {
+            Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         cameraSource.release()
+        isCameraStarted = false
     }
 
     override fun onResume() {
         super.onResume()
-        iniBc()
+        initBarcodeScanner()
     }
 }
-
