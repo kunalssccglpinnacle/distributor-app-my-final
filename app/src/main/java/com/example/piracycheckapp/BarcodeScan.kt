@@ -5,8 +5,12 @@ import GetKeyResponse
 import SearchBarr1Request
 import SearchBarr1Response
 import android.annotation.SuppressLint
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
@@ -102,33 +106,45 @@ class BarcodeScan : AppCompatActivity() {
         })
     }
 
-    private fun getBarcodeInfo(barcode: String) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://nodei.ssccglpinnacle.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(OkHttpClient.Builder().build())
-            .build()
+    private fun getBarcodeInfo(barcode: String){
+        if (barcode.contains("-")) {
+            searchBarr1(barcode)
+        }else{
+            val retrofit = Retrofit.Builder()
+                .baseUrl("https://nodei.ssccglpinnacle.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(OkHttpClient.Builder().build())
+                .build()
 
-        val api = retrofit.create(ApiService::class.java)
-        val call = api.getKey(barcode)
-        call.enqueue(object : Callback<GetKeyResponse> {
-            override fun onResponse(call: Call<GetKeyResponse>, response: Response<GetKeyResponse>) {
-                if (response.isSuccessful) {
-                    val result = response.body()
-                    result?.let {
-                        showBarcodeInfo(it)
+            val api = retrofit.create(ApiService::class.java)
+            val call = api.getKey(barcode)
+            call.enqueue(object : Callback<GetKeyResponse> {
+                override fun onResponse(call: Call<GetKeyResponse>, response: Response<GetKeyResponse>) {
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        result?.let {
+                            showBarcodeInfo(it)
+                        }
+                    } else {
+                        showToast("Failed to get response from server")
                     }
-                } else {
-                    showToast("Failed to get response from server")
                 }
-            }
 
-            override fun onFailure(call: Call<GetKeyResponse>, t: Throwable) {
-                t.printStackTrace()
-                showToast("Failed to connect to server")
-            }
-        })
+                override fun onFailure(call: Call<GetKeyResponse>, t: Throwable) {
+                    t.printStackTrace()
+                    showToast("Failed to connect to server")
+                }
+            })
+        }
     }
+
+
+
+
+
+
+
+
 
     private fun showBarcodeInfo(apiResponse: GetKeyResponse?) {
         if (apiResponse != null) {
@@ -165,21 +181,40 @@ class BarcodeScan : AppCompatActivity() {
                         showSearchBarr1Response(it)
                     }
                 } else {
-                    showToast("Failed to get response from server")
+                    showToast("Failed to get response from api 2")
                 }
             }
 
             override fun onFailure(call: Call<SearchBarr1Response>, t: Throwable) {
                 t.printStackTrace()
-                showToast("Failed to connect to server")
+                showToast("Failed to connect to api 2")
             }
         })
     }
 
+//    private fun showSearchBarr1Response(response: SearchBarr1Response) {
+//        val message = "Belongs to :\nBelongs to--> ${response.result }\n verified "
+//        runOnUiThread {
+//            binding.txtMessage?.text = message
+//            binding.txtMessage?.visibility = View.VISIBLE
+//        }
+//    }
+
+
     private fun showSearchBarr1Response(response: SearchBarr1Response) {
-        val message = "Belongs to :\nBelongs to--> ${response.result }\n verified "
+        val result = response.result
+        val message = "Belongs to : ${result}\n verified "
+
+        val coloredMessage = if (result == "Not Verified") {
+            val spannable = SpannableString(message)
+            spannable.setSpan(ForegroundColorSpan(Color.RED), message.indexOf(result), message.indexOf(result) + result.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable
+        } else {
+            message
+        }
+
         runOnUiThread {
-            binding.txtMessage?.text = message
+            binding.txtMessage?.text = coloredMessage
             binding.txtMessage?.visibility = View.VISIBLE
         }
     }
