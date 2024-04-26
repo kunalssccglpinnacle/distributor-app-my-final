@@ -146,23 +146,33 @@ class BarcodeScan : AppCompatActivity() {
 
 
 
+
     private fun showBarcodeInfo(apiResponse: GetKeyResponse?) {
         if (apiResponse != null) {
-            val message = "${apiResponse.key}"
-            runOnUiThread {
-                binding.txtMessage?.text = message
-                binding.txtMessage?.visibility = View.VISIBLE
+            val key = apiResponse.key
+            if (key != null) {
+                runOnUiThread {
+                    binding.txtMessage?.text = key
+                    binding.txtMessage?.visibility = View.VISIBLE
+                }
+                // Call the second API with the key
+                searchBarr1(key)
+            } else {
+                runOnUiThread {
+                    binding.txtMessage?.text = "Not verified"
+                    binding.txtMessage?.visibility = View.VISIBLE
+                }
             }
-
-            // Call the second API with the key
-            searchBarr1(apiResponse.key)
         } else {
             runOnUiThread {
-                binding.txtMessage?.text = "not found in api 1"
+                binding.txtMessage?.text = "Response is null"
                 binding.txtMessage?.visibility = View.VISIBLE
             }
         }
     }
+
+
+
 
     private fun searchBarr1(key: String) {
         val retrofit = Retrofit.Builder()
@@ -192,32 +202,26 @@ class BarcodeScan : AppCompatActivity() {
         })
     }
 
-//    private fun showSearchBarr1Response(response: SearchBarr1Response) {
-//        val message = "Belongs to :\nBelongs to--> ${response.result }\n verified "
-//        runOnUiThread {
-//            binding.txtMessage?.text = message
-//            binding.txtMessage?.visibility = View.VISIBLE
-//        }
-//    }
-
 
     private fun showSearchBarr1Response(response: SearchBarr1Response) {
         val result = response.result
-        val message = "Belongs to : ${result}\n verified "
+        val message = "Belongs to : $result\n verified "
 
         val coloredMessage = if (result == "Not Verified") {
             val spannable = SpannableString(message)
-            spannable.setSpan(ForegroundColorSpan(Color.RED), message.indexOf(result), message.indexOf(result) + result.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(ForegroundColorSpan(Color.RED), 11, message.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             spannable
         } else {
             message
         }
 
         runOnUiThread {
-            binding.txtMessage?.text = coloredMessage
-            binding.txtMessage?.visibility = View.VISIBLE
+            binding.txtMessage1?.text = coloredMessage
+            binding.txtMessage1?.visibility = View.VISIBLE
         }
     }
+
+
 
 
     private fun showToast(message: String) {

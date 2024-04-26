@@ -74,12 +74,13 @@
 
 
     <androidx.cardview.widget.CardView
-        android:layout_width="406dp"
-        android:layout_height="214dp"
+        android:layout_width="wrap_content"
+        android:layout_height="270dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
+        app:cardElevation="16dp"
         app:cardUseCompatPadding="true"
-        tools:ignore="MissingConstraints">
+        tools:ignore="MissingConstraints"
+        app:cardBackgroundColor="@color/blue">
 
         <!-- Your card content here -->
         <LinearLayout
@@ -94,6 +95,7 @@
                 android:layout_height="wrap_content"
                 android:text="Piracy Check"
                 android:textSize="24sp"
+                android:textColor="@color/blue"
                 android:textStyle="bold" />
 
             <TextView
@@ -101,8 +103,19 @@
                 android:id="@+id/txtMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="---Please scan Barcode---"
-                android:textColor="@android:color/holo_green_dark"
+                android:text=""
+                android:textColor="#4ae54a"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+
+            <TextView
+
+                android:id="@+id/txtMessage1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#4ae54a"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
@@ -119,7 +132,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
