@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/white"
     tools:context=".BarcodeScan">
 
     <FrameLayout
@@ -80,7 +80,7 @@
         app:cardElevation="16dp"
         app:cardUseCompatPadding="true"
         tools:ignore="MissingConstraints"
-        app:cardBackgroundColor="@color/blue">
+       >
 
         <!-- Your card content here -->
         <LinearLayout
@@ -105,10 +105,18 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textColor="#4ae54a"
-                android:textSize="24sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
+            <TextView
 
+                android:id="@+id/txtCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="scan count"
+                android:textColor="#4ae54a"
+                android:textSize="12sp"
+                android:textStyle="bold" />
             <TextView
 
                 android:id="@+id/txtMessage1"
@@ -116,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textColor="#4ae54a"
-                android:textSize="24sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
         </LinearLayout>

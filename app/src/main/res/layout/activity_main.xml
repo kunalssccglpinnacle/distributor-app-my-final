@@ -13,7 +13,9 @@
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
         app:cardUseCompatPadding="true"
-        tools:ignore="MissingConstraints">
+        tools:ignore="MissingConstraints"
+        
+        >
 
         <ImageView
             android:id="@+id/imgBarcode"

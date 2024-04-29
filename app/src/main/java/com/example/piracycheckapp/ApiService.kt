@@ -13,6 +13,16 @@ data class SearchBarr1Request(val searchValue: String)
 // Define the SearchBarr1Response class to match the JSON response
 data class SearchBarr1Response(val result: String)
 
+
+data class AddBarcodeRequest(
+    val barcode: String
+)
+data class CountRequest(
+    val barcode: String
+)
+
+data class CountResponse(val count: Int)
+
 // Define the ApiService interface
 interface ApiService {
     @GET("getKey/{barcode}")
@@ -20,5 +30,13 @@ interface ApiService {
 
     @POST("searchBarr1")
     fun searchBarr1(@Body requestBody: SearchBarr1Request): Call<SearchBarr1Response>
+
+    // New API method
+    @POST("barcodeadd")
+    fun addBarcode(@Body request: AddBarcodeRequest): Call<Void>
+    // New API method
+    @POST("count")
+    fun getCount(@Body request: CountRequest): Call<CountResponse>
+
 }
 
