@@ -36,10 +36,7 @@ class BarcodeScan : AppCompatActivity() {
     private var isCameraStarted = false
     private var lastScannedBarcode: String? = null
 
-
 private var barcodeAdded = false
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBarcodeScanBinding.inflate(layoutInflater)
@@ -111,11 +108,33 @@ private var barcodeAdded = false
                         barcodeAdded = true
                         lastScannedBarcode = scannedBarcode
                         getBarcodeInfo(scannedBarcode)
+
+
+
+
+                        binding.txtDetectedItems?.text =  "$scannedBarcode"
+                        binding.txtDetectedItems?.visibility = View.VISIBLE
+
+
+
+
+
+
                     }
                 }
             }
         })
+
+
+
+
+
+
+
+
     }
+
+
 
     private fun getBarcodeInfo(barcode: String){
 
@@ -150,10 +169,6 @@ private var barcodeAdded = false
             })
         }
     }
-
-
-
-
     private fun showBarcodeInfo(apiResponse: GetKeyResponse?) {
         if (apiResponse != null) {
             val key = apiResponse.key
@@ -161,8 +176,8 @@ private var barcodeAdded = false
 
             if (key != null) {
                 runOnUiThread {
-//                    binding.txtMessage?.text = key
-//                    binding.txtMessage?.visibility = View.VISIBLE
+                    binding.txtMessage?.text = key
+                    binding.txtMessage?.visibility = View.VISIBLE
                 }
                 // Call the second API with the key
                 searchBarr1(key)
@@ -218,15 +233,12 @@ private var barcodeAdded = false
         } else {
             message
         }
-
         runOnUiThread {
             binding.txtMessage1?.text = coloredMessage
             binding.txtMessage1?.visibility = View.VISIBLE
 
-            binding.txtMessage?.text = ""
+            binding.txtMessage?.text = response.result
             binding.txtMessage?.visibility = View.VISIBLE
-
-
         }
     }
     private fun showToast(message: String) {
@@ -289,6 +301,9 @@ private var barcodeAdded = false
                     runOnUiThread {
                         binding.txtCount.text = spannable
                         binding.txtCount.visibility = View.VISIBLE
+
+                        binding.txtMessage1.text = ""
+                        binding.txtMessage1.visibility = View.VISIBLE
                     }
                 } else {
                     showToast("Failed to get count from the server: ${response.code()}")

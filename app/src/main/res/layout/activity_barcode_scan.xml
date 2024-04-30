@@ -84,8 +84,8 @@
 
         <!-- Your card content here -->
         <LinearLayout
-            android:layout_width="397dp"
-            android:layout_height="295dp"
+            android:layout_width="371dp"
+            android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:orientation="vertical"
             android:padding="16dp">
@@ -94,16 +94,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Piracy Check"
-                android:textSize="24sp"
                 android:textColor="@color/blue"
+                android:textSize="24sp"
                 android:textStyle="bold" />
+
+
+            <TextView
+                android:id="@+id/txtDetectedItems"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barcode Value"
+                android:textColor="@color/design_default_color_secondary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
 
             <TextView
 
                 android:id="@+id/txtMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Please scane barcode!!!!"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="!!Please scane barcode!!"
                 android:textColor="#4ae54a"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -111,18 +122,19 @@
             <TextView
 
                 android:id="@+id/txtCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="!!Please scane barcode!!"
                 android:textColor="#4ae54a"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
             <TextView
 
                 android:id="@+id/txtMessage1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="!!Please scane barcode!!"
                 android:textColor="#4ae54a"
                 android:textSize="16sp"
                 android:textStyle="bold" />
