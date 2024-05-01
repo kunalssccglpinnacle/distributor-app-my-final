@@ -1,5 +1,6 @@
 package com.example.piracycheckapp
 
+
 import AddBarcodeRequest
 import ApiService
 import CountRequest
@@ -8,15 +9,19 @@ import GetKeyResponse
 import SearchBarr1Request
 import SearchBarr1Response
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.piracycheckapp.databinding.ActivityBarcodeScanBinding
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
@@ -35,8 +40,8 @@ class BarcodeScan : AppCompatActivity() {
     private lateinit var cameraSource: CameraSource
     private var isCameraStarted = false
     private var lastScannedBarcode: String? = null
+    private var barcodeAdded = false
 
-private var barcodeAdded = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBarcodeScanBinding.inflate(layoutInflater)
@@ -64,7 +69,7 @@ private var barcodeAdded = false
             override fun surfaceCreated(holder: SurfaceHolder) {
                 if (!isCameraStarted) {
                     try {
-                        cameraSource.start(binding.surfaceView!!.holder)
+                        cameraSource.start(binding.surfaceView!!.holder) // supress
                         isCameraStarted = true
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -90,14 +95,12 @@ private var barcodeAdded = false
                     showToast("Error stopping camera")
                 }
             }
-
         })
 
         barcodeDetector.setProcessor(object : Detector.Processor<Barcode> {
             override fun release() {
                 showToast("Barcode scanner has been stopped")
             }
-
 
             override fun receiveDetections(detections: Detector.Detections<Barcode>) {
                 val barcodes = detections.detectedItems
@@ -108,37 +111,28 @@ private var barcodeAdded = false
                         barcodeAdded = true
                         lastScannedBarcode = scannedBarcode
                         getBarcodeInfo(scannedBarcode)
-
-
-
-
                         binding.txtDetectedItems?.text =  "$scannedBarcode"
                         binding.txtDetectedItems?.visibility = View.VISIBLE
 
-
-
-
-
-
+                        // Vibrate when a new barcode is scanned
+                        vibrate()
                     }
                 }
             }
         })
-
-
-
-
-
-
-
-
     }
 
-
+    private fun vibrate() {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(500)
+        }
+    }
 
     private fun getBarcodeInfo(barcode: String){
-
-
 
         if (barcode.contains("-")) {
             searchBarr1(barcode)
@@ -320,6 +314,7 @@ private var barcodeAdded = false
         })
     }
 
+
     override fun onPause() {
         super.onPause()
         cameraSource.release()
@@ -331,8 +326,3 @@ private var barcodeAdded = false
         initBarcodeScanner()
     }
 }
-
-
-
-
-
